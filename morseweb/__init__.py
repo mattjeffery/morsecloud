@@ -5,6 +5,7 @@ from sqlalchemy import engine_from_config
 
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+from pyramid.renderers import JSONP
 
 from .models import DBSession
 from .routing import add_routes
@@ -25,6 +26,8 @@ def main(global_config, **settings):
     config = Configurator(authentication_policy=authentication_policy,
                           authorization_policy=authorization_policy,
                           settings=settings)
+
+    config.add_renderer('jsonp', JSONP(param_name='callback'))
 
     # static content
     config.add_static_view('static', 'static', cache_max_age=3600)
