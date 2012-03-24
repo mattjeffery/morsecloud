@@ -152,7 +152,7 @@ class morseCodec(object):
             self.audioWriter.close()
         
     def text2audio(self, text, filename, customWriter=None, closeWriter=True):
-        self.tabs2audio(text2tabs(text), filename, customWriter, closeWriter)
+        self.tabs2audio(self.text2tab(text), filename, customWriter, closeWriter)
         
     def sine(self,length):
         for i in range(length):
