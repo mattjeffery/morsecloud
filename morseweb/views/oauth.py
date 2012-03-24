@@ -1,6 +1,4 @@
 import urllib
-import urllib2
-import simplejson
 import transaction
 
 import pyramid.settings
@@ -14,20 +12,11 @@ from sqlalchemy.exc import DBAPIError
 
 from ..models import DBSession
 from ..models.user import User
+from . import json_request
 
 CONNECT_URL = "https://soundcloud.com/connect"
 TOKEN_URL = "https://api.soundcloud.com/oauth2/token"
 USER_URL = "https://api.soundcloud.com/me.json"
-
-def json_request(url, params, method='GET'):
-    """Make a request and parse the response as json
-    """
-    if method == 'GET':
-        request = urllib2.urlopen(url+"?"+urllib.urlencode(params))
-    else:
-        request = urllib2.urlopen(url, urllib.urlencode(params))
-
-    return simplejson.load(request)
 
 @view_config(route_name='soundcloud_callback', renderer='jsonp')
 def soundcloud_callback(request):

@@ -1,7 +1,11 @@
+import urllib2
+import logging
+
 import morseweb.morsecodec
 from StringIO import StringIO
 
 import pyramid.security
+import pyramid.settings
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -9,6 +13,9 @@ from pyramid.view import view_config
 from ..models import DBSession
 from ..models.user import User
 
+from . import json_request
+
+log = logging.getLogger(__name__)
 
 @view_config(route_name='encode')
 def encode(request):
@@ -36,6 +43,24 @@ def encode(request):
 def decode(request):
     """Decode some morse!
     """
+    settings = pyramid.settings.get_settings()
+    client_id = settings['soundcloud.client.id']
 
-    return { "error": { "code": "400",
-                        "msg": ":(" } }
+    track_id = request.GET.get('track_id')
+    if not track_id:
+        return { "error": { "code": "400",
+                            "msg": "missing track_id argument" },
+                 "success": False }
+
+    else:
+        track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
+                             { 'client_id': client_id })
+
+        dlurl = track.get('download_url')+'?client_id='+client_id
+
+        log.debug("Track to download: {0}".format(dlurl))
+
+        #~ urllib2.urlopen()
+
+        return { "response": { "message": "hello" },
+                 "success": True }
