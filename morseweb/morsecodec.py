@@ -21,6 +21,15 @@ def replace(a_list, item, new_item):
     while item in a_list:
         a_list[a_list.index[item]] = new_item
     return a_list
+    
+def hard_norm(a_list, midpoint):
+    ret_list = []
+    for uniq_val in set(a_list):
+        if uniq_val > midpoint:
+            a_list = replace(a_list, uniq_val, 1)
+        else:
+            a_list = replace(a_list, uniq_val, 0)
+    return a_list
 
 class morseCodec(object):
     """class for encoding and decoding morse.
@@ -98,14 +107,14 @@ class morseCodec(object):
     # wave in 100 samples, we get a tone of 441 Hz.  If we produce two
     # sine waves in these 100 samples, we get a tone of 882 Hz.  882 Hz
     # appears to be a nice one for playing morse code.
-    def mkwave(self, octave=2):
+    def mkwave(self, octave=1):
         sinewave = ''
         for i in range(100):
             val = int(math.sin(math.pi * i * octave / 50.0) * 30000)
             sinewave += chr((val >> 8) & 255) + chr(val & 255)
         return sinewave
         
-    def setaudiowriter(self, filename, writer=aifc):
+    def setaudiowriter(self, filename, writer=wave):
         self.audioWriterClass = writer
         self.audioWriter = self.audioWriterClass.open(filename, 'w')
         self.audioWriter.setframerate(44100)
@@ -177,6 +186,13 @@ class morseCodec(object):
                               len(self.mkwave())*self.dot):
             rms_stream.append(audioop.rms(data[start:end_idx], 2))
             start = end_idx
+        midpoint = (max(rms_stream) - min(rms_stream))/2
+        normed_power = hard_norm(rms_stream, midpoint)
+        str_seq = ''.join([str(i) for i in normed_power])
+        return self.str2tab(str_seq)
+        
+    def str2tab(self, str_seq):
+        pass
         
     
 class morseCodecTests(unittest.TestCase):
