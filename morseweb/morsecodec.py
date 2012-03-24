@@ -120,14 +120,14 @@ class morseCodec(object):
     # wave in 100 samples, we get a tone of 441 Hz.  If we produce two
     # sine waves in these 100 samples, we get a tone of 882 Hz.  882 Hz
     # appears to be a nice one for playing morse code.
-    def mkwave(self, octave=1):
+    def mkwave(self, octave=2):
         sinewave = ''
         for i in range(100):
             val = int(math.sin(math.pi * i * octave / 50.0) * 30000)
             sinewave += chr((val >> 8) & 255) + chr(val & 255)
         return sinewave
         
-    def setaudiowriter(self, filename, writer=wave):
+    def setaudiowriter(self, filename, writer=aifc):
         self.audioWriterClass = writer
         self.audioWriter = self.audioWriterClass.open(filename, 'w')
         self.audioWriter.setframerate(44100)
@@ -232,6 +232,8 @@ class morseCodecTests(unittest.TestCase):
         assert self.c.tab2text(self.c.text2tab(testText)) == testText.upper()
     def test_identity_tab(self, testTab='..\x01 \x01.-..\x01..\x01-.-\x01.\x01 \x01-.-.\x01....\x01.\x01.\x01...\x01.\x01.-.-.-\x01'):
         assert self.c.text2tab(self.c.tab2text(testTab)) == testTab
+    def test_identity_audio(self, testText="I like Cheese."):
+        self.c.text2audio()
 
 if __name__ == '__main__':
     unittest.main()
