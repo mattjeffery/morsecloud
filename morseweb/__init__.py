@@ -29,10 +29,10 @@ def main(global_config, **settings):
 
     config.add_renderer('jsonp', JSONP(param_name='callback'))
 
-    # static content
-    config.add_static_view('static', 'static', cache_max_age=3600)
-
     config = add_routes(config, **settings)
+
+    # static content
+    config.add_static_view('', 'static', cache_max_age=3600)
 
     config.scan(".views")
     return config.make_wsgi_app()
