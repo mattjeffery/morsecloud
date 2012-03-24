@@ -1,17 +1,10 @@
-from wsgiref.simple_server import make_server
-from pyramid.config import Configurator
-from pyramid.response import Response
+import os
 
-def hello_world(request):
-    return Response('Hello %(name)s!' % request.matchdict)
+from paste.deploy import loadapp
+from paste.script.cherrypy_server import cpwsgi_server
 
-if __name__ == '__main__':
-    import os
-
-    config = Configurator()
-    config.add_route('hello', '/hello/{name}')
-    config.add_view(hello_world, route_name='hello')
-    app = config.make_wsgi_app()
-    port = int(os.environ.get('PORT', 8080))
-    server = make_server('0.0.0.0', port, app)
-    server.serve_forever()
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    wsgi_app = loadapp('config:production.ini', relative_to='.')
+    cpwsgi_server(wsgi_app, host='0.0.0.0', port=port,
+                  numthreads=10, request_queue_size=200)

@@ -1,2 +1,6 @@
 *.pyc
 venv
+*.ini
+*.db
+morseweb.egg-info/
+*.dat
