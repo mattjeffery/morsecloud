@@ -15,6 +15,7 @@ import sys, math
 import os
 import audioop
 import wave, aifc
+import audioread
 import unittest
 
 def replace(a_list, item, new_item):
@@ -133,9 +134,12 @@ class morseCodec(object):
         self.audioWriter.setsampwidth(2)
         self.audioWriter.setnchannels(1)
     
-    def setaudioreader(self, filename, reader=aifc):
+    def setaudioreader(self, filename, reader=audioread):
         self.audioReaderClass = reader
-        self.audioReader = self.audioReaderClass.open(filename)
+        try:
+            self.audioReader = self.audioReaderClass.audio_open(filename)
+        except AttributeError:
+            self.audioReader = self.audioReaderClass.open(filename)
     
     def tabs2bitlength(self, line):
         length = 0
@@ -192,7 +196,7 @@ class morseCodec(object):
         
         rms_stream = []
         start = 0
-        data = self.audioReader.readframes(-1)
+        data =''.join([block for block in self.audioReader])
         for end_idx in xrange(len(self.mkwave())*self.dot, 
                               len(data)+len(self.mkwave())*self.dot, 
                               len(self.mkwave())*self.dot):
