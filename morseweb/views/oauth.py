@@ -1,8 +1,10 @@
-import pyramid.settings
 import urllib
 import urllib2
 import simplejson
 import transaction
+
+import pyramid.settings
+import pyramid.security
 
 from pyramid.response import Response
 from pyramid.view import view_config
@@ -65,7 +67,12 @@ def soundcloud_callback(request):
                 # update the oauth token
                 user.access_token=token['access_token']
 
-        return Response(str(user))
+        response = Response(str(user))
+
+        headers = pyramid.security.remember(request, user.id)
+        response.headerlist.extend(headers)
+
+        return response
 
 @view_config(route_name='soundcloud_connect')
 def soundcloud_connect(request):
