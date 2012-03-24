@@ -6,6 +6,8 @@ def hello_world(request):
    return Response('Hello %(name)s!' % request.matchdict)
 
 if __name__ == '__main__':
+    import os
+
    config = Configurator()
    config.add_route('hello', '/hello/{name}')
    config.add_view(hello_world, route_name='hello')
