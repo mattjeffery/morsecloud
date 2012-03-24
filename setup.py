@@ -4,15 +4,10 @@ from setuptools import setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
 
-requires = [
-    'pyramid',
-    'SQLAlchemy',
-    'transaction',
-    'pyramid_tm',
-    'pyramid_debugtoolbar',
-    'zope.sqlalchemy',
-    'waitress',
-    ]
+requires = []
+
+with open("requirements.txt") as requires_file:
+    requires = requires_file.readlines()
 
 setup(name='morseweb',
       version='0.0',
