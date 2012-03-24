@@ -18,18 +18,30 @@ import wave, aifc
 import unittest
 
 def replace(a_list, item, new_item):
+    '''generic replace method in a list.'''
+    if item == new_item:
+        return a_list
     while item in a_list:
-        a_list[a_list.index[item]] = new_item
+        a_list[a_list.index(item)] = new_item
     return a_list
     
 def hard_norm(a_list, midpoint):
     ret_list = []
     for uniq_val in set(a_list):
         if uniq_val > midpoint:
-            a_list = replace(a_list, uniq_val, 1)
+            if uniq_val != 1:
+                a_list = replace(a_list, uniq_val, 1)
         else:
-            a_list = replace(a_list, uniq_val, 0)
+            if uniq_val != 0:
+                a_list = replace(a_list, uniq_val, 0)
     return a_list
+
+def rreplaced(a_str, find, replace, **kwargs):
+    """does a find and replace, but from right to left rather than left to right, 
+     returns the resulting string
+     passes any additional kwargs to replaced"""
+    return ''.join(reversed(''.join(reversed(a_str)).replace(find,replace, **kwargs)))
+    
 
 class morseCodec(object):
     """class for encoding and decoding morse.
@@ -123,7 +135,7 @@ class morseCodec(object):
     
     def setaudioreader(self, filename, reader=aifc):
         self.audioReaderClass = reader
-        self.audioReader = self.audioReaderClass(filename)
+        self.audioReader = self.audioReaderClass.open(filename)
     
     def tabs2bitlength(self, line):
         length = 0
@@ -191,9 +203,20 @@ class morseCodec(object):
         str_seq = ''.join([str(i) for i in normed_power])
         return self.str2tab(str_seq)
         
-    def str2tab(self, str_seq):
-        pass
+    def audio2text(self, filename, customReader=None):
+        tab = self.audio2tabs(filename, customReader=customReader)
+        return self.tab2text(tab)
         
+    def str2tab(self, str_seq):
+        #spaces
+        str_seq = rreplaced(str_seq, '000000', '\x01 \x01')
+        #char breaks
+        str_seq = rreplaced(str_seq, '000', '\x01')
+        #dashes
+        str_seq = str_seq.replace('1110', '-')
+        #dots
+        str_seq = str_seq.replace('10', '.')
+        return str_seq
     
 class morseCodecTests(unittest.TestCase):
     def setUp(self):
