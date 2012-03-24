@@ -10,13 +10,13 @@ from ..models import DBSession
 from ..models.user import User
 
 
-@view_config(route_name='play')
-def play(request):
+@view_config(route_name='encode')
+def encode(request):
     """Generate some morse!
     """
 
     msg_text = request.POST.get('text') or request.GET.get('text', 'sos')
-    
+
     # store the audio in memory
     strio_out = StringIO()
 
@@ -31,3 +31,11 @@ def play(request):
 
     # output the audio
     return Response(strio_out.read(), content_type=mime_type)
+
+@view_config(route_name='decode', renderer='jsonp')
+def decode(request):
+    """Decode some morse!
+    """
+
+    return { "error": { "code": "400",
+                        "msg": ":(" } }
