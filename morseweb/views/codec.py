@@ -46,7 +46,7 @@ def decode(request):
     settings = pyramid.settings.get_settings()
     client_id = settings['soundcloud.client.id']
 
-    track_id = request.GET.get('track_id')
+    track_id = request.GET.get('track_id') or request.POST.get('track_id')
     if not track_id:
         return { "error": { "code": "400",
                             "msg": "missing track_id argument" },
