@@ -5,17 +5,7 @@ from sqlalchemy import (
     Unicode,
     )
 
-from sqlalchemy.ext.declarative import declarative_base
-
-from sqlalchemy.orm import (
-    scoped_session,
-    sessionmaker,
-    )
-
-from zope.sqlalchemy import ZopeTransactionExtension
-
-DBSession = scoped_session(sessionmaker(extension=ZopeTransactionExtension()))
-Base = declarative_base()
+from morseweb.models import Base
 
 class MyModel(Base):
     __tablename__ = 'models'
@@ -26,4 +16,3 @@ class MyModel(Base):
     def __init__(self, name, value):
         self.name = name
         self.value = value
-

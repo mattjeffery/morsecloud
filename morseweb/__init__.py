@@ -4,6 +4,7 @@ from pyramid.config import Configurator
 from sqlalchemy import engine_from_config
 
 from .models import DBSession
+from .routing import add_routes
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -18,7 +19,9 @@ def main(global_config, **settings):
 
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
-    config.add_route('home', '/')
-    config.scan()
+
+    config = add_routes(config, **settings)
+
+    config.scan(".views")
     return config.make_wsgi_app()
 
