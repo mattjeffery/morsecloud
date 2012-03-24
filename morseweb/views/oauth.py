@@ -29,7 +29,7 @@ def json_request(url, params, method='GET'):
 
     return simplejson.load(request)
 
-@view_config(route_name='soundcloud_callback')
+@view_config(route_name='soundcloud_callback', renderer='jsonp')
 def soundcloud_callback(request):
     """Handle the sound cloud oauth callback
     """
