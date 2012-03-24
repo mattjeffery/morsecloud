@@ -27,6 +27,12 @@ def main(argv=sys.argv):
     config_uri = argv[1]
     setup_logging(config_uri)
     settings = get_appsettings(config_uri)
+
+    # load some config options from the env vars
+    for option, value in settings.items():
+        if value.startswith('$'):
+            settings[option] = os.environ.get(value[1:])
+
     engine = engine_from_config(settings, 'sqlalchemy.')
     DBSession.configure(bind=engine)
     Base.metadata.create_all(engine)
