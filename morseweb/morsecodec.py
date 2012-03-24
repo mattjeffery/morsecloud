@@ -121,7 +121,7 @@ class morseCodec(object):
             elif c == '-':
                 self.sine(self.dah)
             else:   # space
-                self.pause(self.dah*2+self.dot)
+                self.pause(self.dah+self.dot)
             self.pause(self.dot)
         self.audioWriter.close()
         
