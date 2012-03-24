@@ -18,9 +18,30 @@ import wave, aifc
 import unittest
 
 def replace(a_list, item, new_item):
+    '''generic replace method in a list.'''
+    if item == new_item:
+        return a_list
     while item in a_list:
-        a_list[a_list.index[item]] = new_item
+        a_list[a_list.index(item)] = new_item
     return a_list
+    
+def hard_norm(a_list, midpoint):
+    ret_list = []
+    for uniq_val in set(a_list):
+        if uniq_val > midpoint:
+            if uniq_val != 1:
+                a_list = replace(a_list, uniq_val, 1)
+        else:
+            if uniq_val != 0:
+                a_list = replace(a_list, uniq_val, 0)
+    return a_list
+
+def rreplaced(a_str, find, replace, **kwargs):
+    """does a find and replace, but from right to left rather than left to right, 
+     returns the resulting string
+     passes any additional kwargs to replaced"""
+    return ''.join(reversed(''.join(reversed(a_str)).replace(find,replace, **kwargs)))
+    
 
 class morseCodec(object):
     """class for encoding and decoding morse.
@@ -98,14 +119,14 @@ class morseCodec(object):
     # wave in 100 samples, we get a tone of 441 Hz.  If we produce two
     # sine waves in these 100 samples, we get a tone of 882 Hz.  882 Hz
     # appears to be a nice one for playing morse code.
-    def mkwave(self, octave=2):
+    def mkwave(self, octave=1):
         sinewave = ''
         for i in range(100):
             val = int(math.sin(math.pi * i * octave / 50.0) * 30000)
             sinewave += chr((val >> 8) & 255) + chr(val & 255)
         return sinewave
         
-    def setaudiowriter(self, filename, writer=aifc):
+    def setaudiowriter(self, filename, writer=wave):
         self.audioWriterClass = writer
         self.audioWriter = self.audioWriterClass.open(filename, 'w')
         self.audioWriter.setframerate(44100)
@@ -114,7 +135,7 @@ class morseCodec(object):
     
     def setaudioreader(self, filename, reader=aifc):
         self.audioReaderClass = reader
-        self.audioReader = self.audioReaderClass(filename)
+        self.audioReader = self.audioReaderClass.open(filename)
     
     def tabs2bitlength(self, line):
         length = 0
@@ -177,7 +198,25 @@ class morseCodec(object):
                               len(self.mkwave())*self.dot):
             rms_stream.append(audioop.rms(data[start:end_idx], 2))
             start = end_idx
+        midpoint = (max(rms_stream) - min(rms_stream))/2
+        normed_power = hard_norm(rms_stream, midpoint)
+        str_seq = ''.join([str(i) for i in normed_power])
+        return self.str2tab(str_seq)
         
+    def audio2text(self, filename, customReader=None):
+        tab = self.audio2tabs(filename, customReader=customReader)
+        return self.tab2text(tab)
+        
+    def str2tab(self, str_seq):
+        #spaces
+        str_seq = rreplaced(str_seq, '000000', '\x01 \x01')
+        #char breaks
+        str_seq = rreplaced(str_seq, '000', '\x01')
+        #dashes
+        str_seq = str_seq.replace('1110', '-')
+        #dots
+        str_seq = str_seq.replace('10', '.')
+        return str_seq
     
 class morseCodecTests(unittest.TestCase):
     def setUp(self):
