@@ -20,8 +20,8 @@ def main(global_config, **settings):
     config = Configurator(settings=settings)
     config.add_static_view('static', 'static', cache_max_age=3600)
 
-    add_routes(config, **settings)
+    config = add_routes(config, **settings)
 
-    config.scan()
+    config.scan(".views")
     return config.make_wsgi_app()
 
