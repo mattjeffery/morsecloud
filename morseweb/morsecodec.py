@@ -13,9 +13,14 @@ Copyright (c) 2012 .
 
 import sys, math
 import os
+import audioop
 import wave, aifc
 import unittest
 
+def replace(a_list, item, new_item):
+    while item in a_list:
+        a_list[a_list.index[item]] = new_item
+    return a_list
 
 class morseCodec(object):
     """class for encoding and decoding morse.
@@ -100,30 +105,50 @@ class morseCodec(object):
             sinewave += chr((val >> 8) & 255) + chr(val & 255)
         return sinewave
         
-    def setaudiowriter(self, writer=aifc):
+    def setaudiowriter(self, filename, writer=aifc):
         self.audioWriterClass = writer
-        
-    def setupwriter(self, filename):
         self.audioWriter = self.audioWriterClass.open(filename, 'w')
         self.audioWriter.setframerate(44100)
         self.audioWriter.setsampwidth(2)
         self.audioWriter.setnchannels(1)
     
-    def tab2audio(self, line, filename, customWriter=None):
+    def setaudioreader(self, filename, reader=aifc):
+        self.audioReaderClass = reader
+        self.audioReader = self.audioReaderClass(filename)
+    
+    def tabs2bitlength(self, line):
+        length = 0
+        for c in line:
+            if c == '.':
+                 length += len(self.wave)*self.dot
+            elif c == '-':
+                 length += len(self.wave)*self.dah
+            elif c == '\x01': #char break
+                 length += len(self.nowave)*self.dot*2
+            else:   # space, don't add anything 
+                 continue
+            length += len(self.nowave) * self.dot
+        return length
+        
+    def tabs2audio(self, line, filename, customWriter=None):
         if customWriter:
-            self.setaudiowriter(customWriter)
+            self.setaudiowriter(filename, customWriter)
         else:
-            self.setaudiowriter()
-        self.setupwriter(filename)
+            self.setaudiowriter(filename)
+        if filename == sys.stdout:
+            self.audioWriter.setnframes(self.tabs2bitlength(line))
         for c in line:
             if c == '.':
                 self.sine(self.dot)
             elif c == '-':
                 self.sine(self.dah)
-            else:   # space
-                self.pause(self.dah+self.dot)
+            elif c == '\x01': #char break
+                self.pause(self.dot*2)
+            else:   # space, don't add anything 
+                continue
             self.pause(self.dot)
-        self.audioWriter.close()
+        if not filename == sys.stdout:
+            self.audioWriter.close()
         
     def sine(self,length):
         for i in range(length):
@@ -132,7 +157,22 @@ class morseCodec(object):
     def pause(self, length):
         for i in range(length):
             self.audioWriter.writeframesraw(self.nowave)
-    
+            
+    #decode bits are here, currently only fixed width (window)
+    def audio2tabs(self, filename, customReader=None):
+        if customReader:
+            self.setaudioreader(filename, customReader)
+        else:
+            self.setaudioreader(filename)
+        
+        rms_stream = []
+        start = 0
+        data = self.audioReader.readframes(-1)
+        for end_idx in xrange(len(self.mkwave())*self.dot, 
+                              len(data)+len(self.mkwave())*self.dot, 
+                              len(self.mkwave())*self.dot):
+            rms_stream.append(audioop.rms(data[start:end_idx], 2))
+            start = end_idx
     
 class morseCodecTests(unittest.TestCase):
     def setUp(self):
