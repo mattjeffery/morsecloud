@@ -130,12 +130,13 @@ class morseCodec(object):
             length += len(self.nowave) * self.dot
         return length
         
-    def tabs2audio(self, line, filename, customWriter=None):
+    def tabs2audio(self, line, filename, customWriter=None, closeWriter=True):
         if customWriter:
             self.setaudiowriter(filename, customWriter)
         else:
             self.setaudiowriter(filename)
-        if filename == sys.stdout:
+        if not closeWriter:
+            #if we aren't closing, we'll gues what the number of frames will be a priori
             self.audioWriter.setnframes(self.tabs2bitlength(line))
         for c in line:
             if c == '.':
@@ -147,8 +148,11 @@ class morseCodec(object):
             else:   # space, don't add anything 
                 continue
             self.pause(self.dot)
-        if not filename == sys.stdout:
+        if closeWriter:
             self.audioWriter.close()
+        
+    def text2audio(self, text, filename, customWriter=None, closeWriter=True):
+        self.tabs2audio(text2tabs(text), filename, customWriter, closeWriter)
         
     def sine(self,length):
         for i in range(length):
@@ -173,6 +177,7 @@ class morseCodec(object):
                               len(self.mkwave())*self.dot):
             rms_stream.append(audioop.rms(data[start:end_idx], 2))
             start = end_idx
+        
     
 class morseCodecTests(unittest.TestCase):
     def setUp(self):
