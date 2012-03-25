@@ -25,10 +25,10 @@ log = logging.getLogger(__name__)
 def encode(request, ext='aiff'):
     """Generate some morse!
     """
-    ext = ext.lstrip('.')
-    if ext in ('aiff', 'aif'):
+    ext = request.matchdict.get('ext').lstrip('.')
+    if ext in (u'aiff', u'aif'):
         opener = aifc
-    elif ext in ('wave', 'wav'):
+    elif ext in (u'wave', u'wav'):
         opener = wave
     else:
         raise ValueError('Filetype {0} not supported'.format(ext))
