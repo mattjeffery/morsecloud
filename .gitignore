@@ -4,3 +4,4 @@ venv
 *.db
 morseweb.egg-info/
 *.dat
+*~
