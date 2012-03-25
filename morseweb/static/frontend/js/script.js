@@ -35,10 +35,10 @@ $('#SCReceiveModal').on('show', function () {
 })
 
 function loadSoundCloudTrack(trackid){
-	$.ajax({url:"http://www.morsecloud.com/api/decode",data:"track_id="+trackid,success: function(){
+	ajaxresp = $.ajax({url:"http://www.morsecloud.com/api/decode",data:"track_id="+trackid,success: function(){
 		$('#SCReceiveModal').modal('hide');	
-		$('#receivemorsetext').val(data.text);
-		$('#receivenormaltext').val(DoMorseDecrypt(data.text));
+		$('#receivemorsetext').val(jQuery.parseJSON(ajaxresp.responseText)[0].message);
+		$('#receivenormaltext').val(DoMorseDecrypt(jQuery.parseJSON(ajaxresp.responseText)[0].message));
 	},
 		error: function(){
 			alert("error");
