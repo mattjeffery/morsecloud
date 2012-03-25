@@ -1,6 +1,9 @@
+import urllib
 import urllib2
 import logging
 import tempfile
+import aifc
+import wave
 
 import morseweb.morsecodec
 from StringIO import StringIO
@@ -24,10 +27,8 @@ def encode(request, ext='aiff'):
     """
     ext = ext.lstrip('.')
     if ext in ('aiff', 'aif'):
-        import aifc
         opener = aifc
     elif ext in ('wave', 'wav'):
-        import wave
         opener = wave
     else:
         raise ValueError('Filetype {0} not supported'.format(ext))
@@ -48,11 +49,59 @@ def encode(request, ext='aiff'):
     # output the audio
     return Response(strio_out.read(), content_type=mime_type)
 
-@view_config(route_name='soundcloud_upload')
+@view_config(route_name='soundcloud_upload', renderer='jsonp')
 def encode_upload(request):
-    pass
-
+    """encode a message and upload it to soundcloud
+    """
     
+    missing = []
+
+    msg_text = request.POST.get('text') or request.GET.get('text')
+    oauth_token = request.POST.get('access_token') or request.GET.get('access_token')
+    title = request.POST.get('title') or request.GET.get('title')
+
+    if not msg_text:
+        missing.append('text')
+
+    if not oauth_token:
+        missing.append('access_token')
+
+    if not title:
+        missing.append('title')
+
+    if len(missing) > 0:
+        return { 'success': False,
+                 'error': { 'msg': 'missing arguments: {0}'.format(missing),
+                            'code': 400 } }
+
+    # store the audio in memory
+    strio_out = StringIO()
+
+    # write the audio
+    m = morseweb.morsecodec.morseCodec()
+    mime_type = m.text2audio(msg_text, strio_out, customWriter=wave, closeWriter=False)
+    if not mime_type:
+        mime_type = 'audio/x-aiff'
+
+    # seek to the begining of the file
+    strio_out.seek(0)
+
+    params = {'oauth_token': oauth_token,
+              'track': { 'asset_data': strio_out.read(),
+                         'title': title,
+                         'sharing': 'public'} }
+
+    try:
+        urlfh = urllib2.urlopen("https://api.soundcloud.com/tracks.json",
+                                urllib.urlencode(params))
+    except urllib2.HTTPError as exc:
+        return { 'success': False,
+                 'error': { 'msg': 'failed with error code: {0}'.format(exc.code),
+                            'code': exc.code } }
+
+    # output the audio
+    return simplejson.load(urlfh)
+
 @view_config(route_name='decode', renderer='jsonp')
 def decode(request):
     """Decode some morse!
