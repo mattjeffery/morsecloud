@@ -6,9 +6,6 @@ import aifc
 import wave
 import soundcloud
 
-from poster.encode import multipart_encode
-from poster.streaminghttp import register_openers
-
 import morseweb.morsecodec
 from StringIO import StringIO
 
