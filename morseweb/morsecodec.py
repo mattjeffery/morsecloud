@@ -233,7 +233,8 @@ class morseCodecTests(unittest.TestCase):
     def test_identity_tab(self, testTab='..\x01 \x01.-..\x01..\x01-.-\x01.\x01 \x01-.-.\x01....\x01.\x01.\x01...\x01.\x01.-.-.-\x01'):
         assert self.c.text2tab(self.c.tab2text(testTab)) == testTab
     def test_identity_audio(self, testText="I like Cheese."):
-        self.c.text2audio()
+        self.c.text2audio(testText, 'test.aiff')
+        assert self.c.audio2text('test.aiff') == testText.upper()
 
 if __name__ == '__main__':
     unittest.main()
