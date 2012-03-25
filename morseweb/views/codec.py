@@ -4,6 +4,10 @@ import logging
 import tempfile
 import aifc
 import wave
+import soundcloud
+
+from poster.encode import multipart_encode
+from poster.streaminghttp import register_openers
 
 import morseweb.morsecodec
 from StringIO import StringIO
@@ -74,33 +78,30 @@ def encode_upload(request):
                  'error': { 'msg': 'missing arguments: {0}'.format(missing),
                             'code': 400 } }
 
-    # store the audio in memory
-    strio_out = StringIO()
+    # temp morse file
+    _, mp3path = tempfile.mkstemp(prefix='mp3-morse-', suffix='.mp3')
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text, strio_out, customWriter=wave, closeWriter=False)
-    if not mime_type:
-        mime_type = 'audio/x-aiff'
+    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave)
 
-    # seek to the begining of the file
-    strio_out.seek(0)
-
-    params = {'oauth_token': oauth_token,
-              'track': { 'asset_data': strio_out.read(),
-                         'title': title,
-                         'sharing': 'public'} }
+    client = soundcloud.Client(access_token=oauth_token)
 
     try:
-        urlfh = urllib2.urlopen("https://api.soundcloud.com/tracks.json",
-                                urllib.urlencode(params))
-    except urllib2.HTTPError as exc:
+        track = client.post('/tracks', track={
+            'title': title,
+            'sharing': 'public',
+            'downloadable': 'true',
+            'asset_data': open(mp3path, 'rb'),
+            'tag_list': 'morsecloud'
+        })
+    except Exception as exc:
         return { 'success': False,
-                 'error': { 'msg': 'failed with error code: {0}'.format(exc.code),
-                            'code': exc.code } }
+                 'error': { 'msg': 'failed with error code',
+                            'code': 500 } }
 
     # output the audio
-    return simplejson.load(urlfh)
+    return {'id': track.id}
 
 @view_config(route_name='decode', renderer='jsonp')
 def decode(request):
@@ -119,13 +120,24 @@ def decode(request):
         track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
                              { 'client_id': client_id })
 
+        if not track.get('download_url'):
+            return { "error": { "code": 403,
+                                "msg": "cannot download that track" },
+                     "success": False }
+
         dlurl = track.get('download_url')+'?client_id='+client_id
 
         log.debug("Track to download: {0}".format(dlurl))
 
         _, mp3path = tempfile.mkstemp(prefix='mp3-morse-', suffix='.mp3')
 
-        mp3content = urllib2.urlopen(dlurl).read()
+        # try to download the track
+        try:
+            mp3content = urllib2.urlopen(dlurl).read()
+        except urllib2.HTTPError as exc:
+            return { "error": { "code": exc.code,
+                                "msg": "error code: {0}".format(exc.code) },
+                     "success": False }
 
         with open(mp3path, 'wb') as mp3file:
             mp3file.write(mp3content)
