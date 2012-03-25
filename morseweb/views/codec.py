@@ -21,11 +21,11 @@ log = logging.getLogger(__name__)
 def encode(request, ext='aiff'):
     """Generate some morse!
     """
-    ext = ext.lstrip('.')
-    if ext in ('aiff', 'aif'):
+    ext = request.matchdict.get('ext').lstrip('.')
+    if ext in (u'aiff', u'aif'):
         import aifc
         opener = aifc
-    elif ext in ('wave', 'wav'):
+    elif ext in (u'wave', u'wav'):
         import wave
         opener = wave
     else:

@@ -156,8 +156,8 @@ class morseCodec(object):
         return length
         
     def tabs2audio(self, line, filename, customWriter=None, closeWriter=True):
-        if customWriter:
-            self.setaudiowriter(filename, customWriter)
+        if customWriter != None:
+            self.setaudiowriter(filename, writer=customWriter)
         else:
             self.setaudiowriter(filename)
         if not closeWriter:
@@ -178,11 +178,11 @@ class morseCodec(object):
         
     def text2audio(self, text, filename, customWriter=None, closeWriter=True):
         """wraps text2tabs and tabs2audio, returns the mimetype (based on the customWriter)"""
-        self.tabs2audio(self.text2tab(text), filename, customWriter, closeWriter)
+        self.tabs2audio(self.text2tab(text), filename, customWriter=customWriter, closeWriter=closeWriter)
         if self.audioWriterClass == aifc:
-            return 'audio/x-aiff'
+            return 'audio/aiff'
         elif self.audioWriterClass == wave:
-            return 'audio/x-wav'
+            return 'audio/wav'
         
     def sine(self,length):
         for i in range(length):
