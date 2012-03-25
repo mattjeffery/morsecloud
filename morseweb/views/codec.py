@@ -35,6 +35,8 @@ def encode(request, ext='aiff'):
         raise ValueError('Filetype {0} not supported'.format(ext))
     msg_text = request.POST.get('text') or request.GET.get('text', 'sos')
 
+    msg_text = urllib.unquote(msg_text)
+
     # store the audio in memory
     strio_out = StringIO()
 
@@ -74,6 +76,8 @@ def encode_upload(request):
         return { 'success': False,
                  'error': { 'msg': 'missing arguments: {0}'.format(missing),
                             'code': 400 } }
+
+    msg_text = urllib.unquote(msg_text)
 
     # temp morse file
     _, mp3path = tempfile.mkstemp(prefix='mp3-morse-', suffix='.mp3')
