@@ -5,3 +5,5 @@ venv
 morseweb.egg-info/
 *.dat
 *~
+*.swp
+*.sw0
