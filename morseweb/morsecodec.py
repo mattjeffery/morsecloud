@@ -120,11 +120,13 @@ class morseCodec(object):
     # wave in 100 samples, we get a tone of 441 Hz.  If we produce two
     # sine waves in these 100 samples, we get a tone of 882 Hz.  882 Hz
     # appears to be a nice one for playing morse code.
-    def mkwave(self, octave=2):
+    def mkwave(self, octave=2, max_val=30000, reverse_endian=False):
         sinewave = ''
         for i in range(100):
-            val = int(math.sin(math.pi * i * octave / 50.0) * 30000)
+            val = int(math.sin(math.pi * i * octave / 50.0) * max_val)
             sinewave += chr((val >> 8) & 255) + chr(val & 255)
+            if reverse_endian:
+                sinewave += chr(val & 255) + chr((val >> 8) & 255)
         return sinewave
         
     def setaudiowriter(self, filename, writer=aifc):
@@ -157,6 +159,8 @@ class morseCodec(object):
         
     def tabs2audio(self, line, filename, customWriter=None, closeWriter=True):
         if customWriter != None:
+            if customWriter==wave:
+                self.wave=self.mkwave(reverse_endian=True)
             self.setaudiowriter(filename, writer=customWriter)
         else:
             self.setaudiowriter(filename)
