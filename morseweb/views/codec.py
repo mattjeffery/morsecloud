@@ -94,7 +94,8 @@ def encode_upload(request):
             'sharing': 'public',
             'downloadable': 'true',
             'asset_data': open(mp3path, 'rb'),
-            'tag_list': 'morsecloud'
+            'tag_list': 'morsecloud',
+            'licence': 'cc-by'
         })
     except Exception as exc:
         return { 'success': False,
