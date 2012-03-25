@@ -124,9 +124,10 @@ class morseCodec(object):
         sinewave = ''
         for i in range(100):
             val = int(math.sin(math.pi * i * octave / 50.0) * max_val)
-            sinewave += chr((val >> 8) & 255) + chr(val & 255)
             if reverse_endian:
                 sinewave += chr(val & 255) + chr((val >> 8) & 255)
+            else:
+                sinewave += chr((val >> 8) & 255) + chr(val & 255)
         return sinewave
         
     def setaudiowriter(self, filename, writer=aifc):
