@@ -2,49 +2,76 @@
 
 */
 
-$('#SCReceiveModal').modal({show:false});
+$('#SCReceiveModal').modal();
+$('#SCReceiveModal').modal('hide');
+$('#SCSendModal').modal();
+$('#SCSendModal').modal('hide');
 
+var audio = new Audio('http://www.morsecloud.com/api/encode.wav?text=lol');
 
 $(document).ready(function(){
-
-$('#sendnormaltext').bind("propertychange keyup input paste",function() {
-  $("#sendmorsetext").val(DoMorseEncrypt($('#sendnormaltext').val()));
-	$("#downloadbtn").attr({href:"http://www.morsecloud.com/api/encode.aiff?text="+escape($('#sendnormaltext').val())})
-});
-
-$('#receivemorsetext').bind("propertychange keyup input paste",function() {
-  $("#receivenormaltext").val(DoMorseDecrypt($('#receivemorsetext').val()));
-});
-
-$('#SCReceiveModal').on('show', function () {
-  ajaxresponse = $.ajax({
-		//-- --- .-. ... .
-  url: "https://api.soundcloud.com/tracks.json?tags="+escape("morse")+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
-  dataType: 'json',
-	success: function(){
-		ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
-		jQuery.each(ajaxresponse, function (){
-			$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this.id+');"><td>'+this.user.username+'</td><td>'+this.title+'</td></a></tr>');
-		})},
-	error: function(){
-		alert("fail!");
-		$('#SCReceiveModal').modal('hide');	
-	}
+	// button bindings
+	$('#playbtn').bind("click", function (){
+		audio.setAttribute("src","http://www.morsecloud.com/api/encode.wav?text="+escape($('#sendnormaltext').val()));
+		audio.play();
 	});
-});
+	$('#micbtn').bind("click", function (){
+		activateMic();
+	});
+
+	// instant encoding/decoding textareas
+	$('#sendnormaltext').bind("propertychange keyup input paste",function() {
+		$("#sendmorsetext").val(DoMorseEncrypt($('#sendnormaltext').val()));
+		$("#downloadbtn").attr({href:"http://www.morsecloud.com/api/encode.wav?text="+escape($('#sendnormaltext').val())});
+	});
+	$('#receivemorsetext').bind("propertychange keyup input paste",function() {
+		$("#receivenormaltext").val(DoMorseDecrypt($('#receivemorsetext').val()));
+	});
+
+	$('#SCReceiveModal').on('show', function () {
+		ajaxresponse = $.ajax({
+			//-- --- .-. ... .
+		url: "https://api.soundcloud.com/tracks.json?tags="+escape("morse")+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
+		dataType: 'json',
+		success: function(){
+			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
+			jQuery.each(ajaxresponse, function (){
+				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this.id+');"><td>'+this.user.username+'</td><td>'+this.title+'</td></a></tr>');
+			})},
+		error: function(){
+			alert("fail!");
+			$('#SCReceiveModal').modal('hide');	
+		}
+		});
+	});
 })
 
 function loadSoundCloudTrack(trackid){
 	ajaxresp = $.ajax({url:"http://www.morsecloud.com/api/decode",data:"track_id="+trackid,success: function(){
 		$('#SCReceiveModal').modal('hide');	
-		$('#receivemorsetext').val(jQuery.parseJSON(ajaxresp.responseText)[0].message);
-		$('#receivenormaltext').val(DoMorseDecrypt(jQuery.parseJSON(ajaxresp.responseText)[0].message));
+		$('#receivemorsetext').val(jQuery.parseJSON(ajaxresp.responseText).response.message);
+		$('#receivenormaltext').val(DoMorseDecrypt(jQuery.parseJSON(ajaxresp.responseText).response.message));
 	},
 		error: function(){
 			alert("error");
 		}
 	}
 );
+}
+
+function activateMic(){
+	$("#uploadbtns").append("<a class=\"btn btn-danger\" id=\"recindicator\" style=\"display:none\">REC...</a>");
+	$("#recindicator").fadeIn();
+	$("#micbtn").addClass("btn-danger");
+	$('#micbtn, #recindicator').bind("click", function (){
+		$('#micbtn').unbind();
+		$("#recindicator").fadeOut();
+		$("#recindicator").detach();
+		$("#micbtn").removeClass("btn-danger");	
+		$('#micbtn').bind("click", function (){
+			activateMic();
+		});
+	});
 }
 
 // Morseinput

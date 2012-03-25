@@ -232,6 +232,7 @@ td { vertical-align: top; }
 h1{
 	font-size: 60px;
 	line-height: 65px;
+	margin-top: 20px;
 }
 h2{
 	margin:0 0 5px 0;
@@ -251,6 +252,7 @@ body{
 	font-family: 'MuseoSlab500', 'Georgia';
 	background: url("../img/bg.jpg");
 	color: #222;
+	overflow:hidden;
 }
 
 header{
@@ -298,6 +300,7 @@ header h1{
 	background: url("../img/straightkey.gif");
 	width:480px;
 	height:300px;
+	z-index:-1;
 }
 
 input[type="button"]{

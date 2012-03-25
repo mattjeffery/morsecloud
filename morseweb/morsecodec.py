@@ -177,7 +177,12 @@ class morseCodec(object):
             self.audioWriter.close()
         
     def text2audio(self, text, filename, customWriter=None, closeWriter=True):
+        """wraps text2tabs and tabs2audio, returns the mimetype (based on the customWriter)"""
         self.tabs2audio(self.text2tab(text), filename, customWriter, closeWriter)
+        if self.audioWriterClass == aifc:
+            return 'audio/x-aiff'
+        elif self.audioWriterClass == wave:
+            return 'audio/x-wav'
         
     def sine(self,length):
         for i in range(length):
@@ -233,7 +238,8 @@ class morseCodecTests(unittest.TestCase):
     def test_identity_tab(self, testTab='..\x01 \x01.-..\x01..\x01-.-\x01.\x01 \x01-.-.\x01....\x01.\x01.\x01...\x01.\x01.-.-.-\x01'):
         assert self.c.text2tab(self.c.tab2text(testTab)) == testTab
     def test_identity_audio(self, testText="I like Cheese."):
-        self.c.text2audio()
+        self.c.text2audio(testText, 'test.aiff')
+        assert self.c.audio2text('test.aiff') == testText.upper()
 
 if __name__ == '__main__':
     unittest.main()
