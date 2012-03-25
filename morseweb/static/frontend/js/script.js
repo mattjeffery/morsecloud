@@ -25,7 +25,7 @@ for (i=0;i<ARRcookies.length;i++)
 
 if (self.document.location.hash.substr(0,13)=="#access_token") {
 	$("#hiddentoken").val(self.document.location.hash.split("&")[0].split("=")[1]);
-	$("#formtext").val(escape(getCookie("text")));
+	$("#formtext").val(getCookie("text"));
 	document.cookie="token="+escape(self.document.location.hash.split("&")[0].split("=")[1]);
 }else{
 	$('#SCSendModal').modal('hide');
@@ -35,7 +35,7 @@ var audio = new Audio();
 
 $(document).ready(function(){
 
-	$('#sendnormaltext').val(escape(getCookie("text")))
+	$('#sendnormaltext').val(getCookie("text"))
 
 	// button bindings
 	$('#playbtn').bind("click", function (){
@@ -58,15 +58,15 @@ $(document).ready(function(){
 	$('#myinbox').bind("click", function(){
 		ajaxresponse = $.ajax({
 			//-- --- .-. ... .
-		url: "https://api.soundcloud.com/me/activities/tracks/exclusive.json?tags="+escape("morsecloud")+"&oauth_token="+escape(getCookie("token"))+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
+		url: "https://api.soundcloud.com/me/activities/tracks/exclusive.json?tags=morsecloud&oauth_token="+escape(getCookie("token"))+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
 		dataType: 'json',
 		success: function(){
 			$('#publictab').removeClass('active');
 			$('#privatetab').addClass('active');
 			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
 			$("#scmorsetable").empty();
-			jQuery.each(ajaxresponse, function (){
-				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this[0].origin.track.id+');"><td>'+this[0].origin.track.user.username+'</td><td>'+this[0].origin.track.title+'</td></a></tr>');
+			jQuery.each(ajaxresponse.collection, function (){
+				$('#scmorsetable').append('<tr onclick="loadSoundCloudTrack(\''+this.origin.track.id+'&oauth_token='+getCookie('token')+'\');"><td>'+this.origin.track.user.username+'</td><td>'+this.origin.track.title+'</td></a></tr>');
 			})},
 		error: function(){
 			alert("fail!");
@@ -86,7 +86,7 @@ $(document).ready(function(){
 			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
 			$("#scmorsetable").empty();
 			jQuery.each(ajaxresponse, function (){
-				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this.id+');"><td>'+this.user.username+'</td><td>'+this.title+'</td></a></tr>');
+				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack("'+this.id+'");"><td>'+this.user.username+'</td><td>'+this.title+'</td></a></tr>');
 			})},
 		error: function(){
 			alert("fail!");
