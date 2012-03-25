@@ -5,14 +5,19 @@
 $('#SCReceiveModal').modal();
 $('#SCReceiveModal').modal('hide');
 $('#SCSendModal').modal();
-$('#SCSendModal').modal('hide');
 
-var audio = new Audio('http://www.morsecloud.com/api/encode.wav?text=lol');
+if (self.document.location.hash.substr(0,13)=="#access_token") {
+	$("#hiddentoken").val(self.document.location.hash.split("&")[0].split("=")[1]);
+}else{
+$('#SCSendModal').modal('hide');
+}
+
+var audio = new Audio();
 
 $(document).ready(function(){
 	// button bindings
 	$('#playbtn').bind("click", function (){
-		audio.setAttribute("src","http://www.morsecloud.com/api/encode.wav?text="+escape($('#sendnormaltext').val()));
+		audio.setAttribute("src","http://www.morsecloud.com/api/encode.wave?text="+escape($('#sendnormaltext').val()));
 		audio.play();
 	});
 	$('#micbtn').bind("click", function (){
@@ -22,7 +27,7 @@ $(document).ready(function(){
 	// instant encoding/decoding textareas
 	$('#sendnormaltext').bind("propertychange keyup input paste",function() {
 		$("#sendmorsetext").val(DoMorseEncrypt($('#sendnormaltext').val()));
-		$("#downloadbtn").attr({href:"http://www.morsecloud.com/api/encode.wav?text="+escape($('#sendnormaltext').val())});
+		$("#downloadbtn").attr({href:"http://www.morsecloud.com/api/encode.wave?text="+escape($('#sendnormaltext').val())});
 	});
 	$('#receivemorsetext').bind("propertychange keyup input paste",function() {
 		$("#receivenormaltext").val(DoMorseDecrypt($('#receivemorsetext').val()));
