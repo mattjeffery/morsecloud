@@ -1,5 +1,6 @@
 import urllib2
 import logging
+import tempfile
 
 import morseweb.morsecodec
 from StringIO import StringIO
@@ -29,7 +30,7 @@ def encode(request):
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text, strio_out, closeWriter=False)
+    m.text2audio(msg_text, strio_out, closeWriter=False)
 
     mime_type = 'audio/x-aiff'
 
@@ -60,7 +61,17 @@ def decode(request):
 
         log.debug("Track to download: {0}".format(dlurl))
 
-        #~ urllib2.urlopen()
+        _, mp3path = tempfile.mkstemp(prefix='mp3-morse-', suffix='.mp3')
 
-        return { "response": { "message": "hello" },
+        mp3content = urllib2.urlopen(dlurl).read()
+
+        with open(mp3path, 'wb') as mp3file:
+            mp3file.write(mp3content)
+
+        m = morseweb.morsecodec.morseCodec()
+        msg = m.audio2text(mp3path)
+
+        #todo delete file
+
+        return { "response": { "message": msg },
                  "success": True }
