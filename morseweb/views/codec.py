@@ -83,7 +83,7 @@ def encode_upload(request):
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text, mp3path, customWriter=wave)
+    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave)
 
     client = soundcloud.Client(access_token=oauth_token)
 
