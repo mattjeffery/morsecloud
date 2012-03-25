@@ -1,4 +1,4 @@
 #!/bin/bash
-(cd externals/audioread/ && python setup.py install)
+python externals/audioread/setup.py develop
 python setup.py develop
 python app.py
