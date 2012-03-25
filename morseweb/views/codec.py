@@ -36,13 +36,14 @@ def encode(request, ext='aiff'):
     msg_text = request.POST.get('text') or request.GET.get('text', 'sos')
 
     msg_text = urllib.unquote(msg_text)
-
+    
     # store the audio in memory
     strio_out = StringIO()
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text, strio_out, customWriter=opener, closeWriter=False)
+    
+    mime_type = m.text2audio(msg_text, strio_out, customWriter=opener, closeWriter=False, ignoreMissing=True)
     if not mime_type:
         mime_type = 'audio/x-aiff'
 
@@ -84,7 +85,7 @@ def encode_upload(request):
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave)
+    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave, ignoreMissing=True)
 
     client = soundcloud.Client(access_token=oauth_token)
 
