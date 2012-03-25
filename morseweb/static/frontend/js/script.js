@@ -35,7 +35,7 @@ $('#SCReceiveModal').on('show', function () {
 })
 
 function loadSoundCloudTrack(trackid){
-	$.ajax({url:"http://www.morsecloud.com/api/decode",data:"trackid="+trackid,success: function(){
+	$.ajax({url:"http://www.morsecloud.com/api/decode",data:"track_id="+trackid,success: function(){
 		$('#SCReceiveModal').modal('hide');	
 		$('#receivemorsetext').val(data.text);
 		$('#receivenormaltext').val(DoMorseDecrypt(data.text));
