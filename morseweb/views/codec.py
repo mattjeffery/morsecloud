@@ -40,6 +40,11 @@ def encode(request):
     # output the audio
     return Response(strio_out.read(), content_type=mime_type)
 
+@view_config(route_name='soundcloud_upload')
+def encode_upload(request):
+    pass
+
+    
 @view_config(route_name='decode', renderer='jsonp')
 def decode(request):
     """Decode some morse!
