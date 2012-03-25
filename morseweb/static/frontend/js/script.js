@@ -41,7 +41,7 @@ $(document).ready(function(){
 	$('#SCReceiveModal').on('show', function () {
 		ajaxresponse = $.ajax({
 			//-- --- .-. ... .
-		url: "https://api.soundcloud.com/tracks.json?tags="+escape("morse")+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
+		url: "https://api.soundcloud.com/tracks.json?tags="+escape("morsecloud")+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
 		dataType: 'json',
 		success: function(){
 			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
