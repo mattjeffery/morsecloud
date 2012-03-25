@@ -22,14 +22,14 @@ def encode(request, ext='aiff'):
     """Generate some morse!
     """
     ext = ext.lstrip('.')
-    if ext in ('aiff', 'aif')
+    if ext in ('aiff', 'aif'):
         import aifc
         opener = aifc
     elif ext in ('wave', 'wav'):
         import wave
         opener = wave
     else:
-        
+        raise ValueError('Filetype {0} not supported'.format(ext))
     msg_text = request.POST.get('text') or request.GET.get('text', 'sos')
 
     # store the audio in memory
@@ -38,8 +38,8 @@ def encode(request, ext='aiff'):
     # write the audio
     m = morseweb.morsecodec.morseCodec()
     mime_type = m.text2audio(msg_text, strio_out, customWriter=opener, closeWriter=False)
-
-    mime_type = 'audio/x-aiff'
+    if not mime_type:
+        mime_type = 'audio/x-aiff'
 
     # seek to the begining of the file
     strio_out.seek(0)
