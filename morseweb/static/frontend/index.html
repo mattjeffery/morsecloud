@@ -93,9 +93,9 @@
 			<form action="/api/soundcloud/upload" method=POST>
 				<input type="hidden" name="access_token" id="hiddentoken" value="" />
 				<label>Track title</label>
-				<input type="text" class="span3" placeholder="tracktitle">
+				<input type="text" class="span3" name="title" placeholder="tracktitle">
 				<label>Morse text</label>
-				<input type="text" class="span3" placeholder="insert your morse text here">
+				<input type="text" class="span3" name="text" id="formtext" placeholder="insert your morse text here">
 				<button type="submit" class="btn">Submit</button>
 			</form>
 			
@@ -107,7 +107,7 @@
 			<a class="close" data-dismiss="modal">×</a>
 			<h3>Read from SoundCloud</h3>
 			<ul class="nav nav-tabs">
-				<li class="active"><a href="#receivepublicsound">Public #morse</a></li>
+				<li class="active"><a href="#receivepublicsound">Public #morsecloud</a></li>
 				<li><a href="#receiveinbox">Your inbox</a></li>
 			</ul>
 		</div>
