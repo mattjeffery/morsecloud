@@ -1,0 +1,3 @@
+[submodule "externals/audioread"]
+	path = externals/audioread
+	url = git@github.com:mattjeffery/audioread.git
