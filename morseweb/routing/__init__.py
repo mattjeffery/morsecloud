@@ -9,5 +9,6 @@ def add_routes(config, **settings):
 
     config.add_route('soundcloud_callback', '/api/soundcloud/oauth-callback')
     config.add_route('soundcloud_connect', '/api/soundcloud/connect')
+    config.add_route('soundcloud_upload', '/api/soundcloud/upload')
 
     return config

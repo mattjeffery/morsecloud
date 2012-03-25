@@ -45,7 +45,7 @@
 					<textarea name="encodedtext" id="sendmorsetext" placeholder="to this: - .... .. ...  - . -..- -  .-- .. .-.. .-..  -... .  . -. -.-. --- -.. . -.."></textarea>
 					<div class="btn-toolbar">
 					<div class="btn-group">
-						<a class="btn" onclick="$('#SCSendModal').modal('show');">Upload to SoundCloud</a>
+						<a class="btn" href="https://soundcloud.com/connect?client_id=1548641e2e37a7ae5f432f22118497e9&response_type=token&redirect_uri=http://www.morsecloud.com/">Upload to SoundCloud</a>
 						<a class="btn" onclick="$('#SCSendModal').modal('show');">or Shoudio</a>
 						
 					</div>
@@ -69,8 +69,8 @@
 				</div>
 				<div class="btn-toolbar">
 					<div class="btn-group">
-						<a class="btn" onclick="$('#SCReceiveModal').modal('show');">Read from SoundCloud</a>
-						<a class="btn" onclick="$('#SCReceiveModal').modal('show');">or Shoudio</a>						
+						<a class="btn" ahref="#" onclick="$('#SCReceiveModal').modal('show');">Read from SoundCloud</a>
+						<a class="btn" ahref="#" onclick="$('#SCReceiveModal').modal('show');">or Shoudio</a>						
 					</div>
 					<div class="btn-group" id="uploadbtns">
 						<a class="btn"><i class="icon-upload"></i></a>
@@ -90,7 +90,15 @@
 			<h3>Upload to SoundCloud</h3>
 		</div>
 		<div class="modal-body">
-			bla
+			<form action="/api/soundcloud/upload" method=POST>
+				<input type="hidden" name="access_token" id="hiddentoken" value="" />
+				<label>Track title</label>
+				<input type="text" class="span3" placeholder="tracktitle">
+				<label>Morse text</label>
+				<input type="text" class="span3" placeholder="insert your morse text here">
+				<button type="submit" class="btn">Submit</button>
+			</form>
+			
 		</div>
 	</div>
 
@@ -123,8 +131,8 @@
 	<script src="js/plugins.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script src="js/bootstrap.modal.js"></script>
-  <script src="js/script.js"></script>
-  <!-- end scripts -->
+	<script src="js/script.js"></script>
+	<!-- end scripts -->
 
 </body>
 </html>

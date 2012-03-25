@@ -2,7 +2,7 @@
 venv
 *.ini
 *.db
-morseweb.egg-info/
+*.egg-info/
 *.dat
 *~
 *.swp

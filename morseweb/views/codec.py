@@ -1,5 +1,6 @@
 import urllib2
 import logging
+import tempfile
 
 import morseweb.morsecodec
 from StringIO import StringIO
@@ -47,6 +48,11 @@ def encode(request, ext='aiff'):
     # output the audio
     return Response(strio_out.read(), content_type=mime_type)
 
+@view_config(route_name='soundcloud_upload')
+def encode_upload(request):
+    pass
+
+    
 @view_config(route_name='decode', renderer='jsonp')
 def decode(request):
     """Decode some morse!
@@ -68,7 +74,17 @@ def decode(request):
 
         log.debug("Track to download: {0}".format(dlurl))
 
-        #~ urllib2.urlopen()
+        _, mp3path = tempfile.mkstemp(prefix='mp3-morse-', suffix='.mp3')
 
-        return { "response": { "message": "hello" },
+        mp3content = urllib2.urlopen(dlurl).read()
+
+        with open(mp3path, 'wb') as mp3file:
+            mp3file.write(mp3content)
+
+        m = morseweb.morsecodec.morseCodec()
+        msg = m.audio2text(mp3path)
+
+        #todo delete file
+
+        return { "response": { "message": msg },
                  "success": True }
