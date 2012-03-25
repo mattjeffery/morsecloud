@@ -41,7 +41,7 @@
 			<h2>Send <span>your text</span></h2>
 			<div class="innercontainer">
 				<div id="encodetextarea">
-					<textarea name="normaltext" id="sendnormaltext" placeholder="this text will be encoded"></textarea>
+					<textarea name="normaltext" id="sendnormaltext" maxlength="140" placeholder="this text will be encoded"></textarea>
 					<textarea name="encodedtext" id="sendmorsetext" placeholder="to this: - .... .. ...  - . -..- -  .-- .. .-.. .-..  -... .  . -. -.-. --- -.. . -.."></textarea>
 					<div class="btn-toolbar">
 					<div class="btn-group">
@@ -107,8 +107,8 @@
 			<a class="close" data-dismiss="modal">×</a>
 			<h3>Read from SoundCloud</h3>
 			<ul class="nav nav-tabs">
-				<li class="active"><a href="#receivepublicsound">Public #morsecloud</a></li>
-				<li><a href="#receiveinbox">Your inbox</a></li>
+				<li class="active" id="publictab"><a href="#receivepublicsound">Public #morsecloud</a></li>
+				<li id="privatetab"><a href="#receiveinbox" id="myinbox">Your inbox</a></li>
 			</ul>
 		</div>
 		<div class="modal-body">

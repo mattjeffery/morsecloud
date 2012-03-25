@@ -6,9 +6,27 @@ $('#SCReceiveModal').modal();
 $('#SCReceiveModal').modal('hide');
 $('#SCSendModal').modal();
 
+
+
+function getCookie(c_name)
+{
+var i,x,y,ARRcookies=document.cookie.split(";");
+for (i=0;i<ARRcookies.length;i++)
+  {
+  x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+  y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+  x=x.replace(/^\s+|\s+$/g,"");
+  if (x==c_name)
+    {
+    return unescape(y);
+    }
+  }
+}
+
 if (self.document.location.hash.substr(0,13)=="#access_token") {
 	$("#hiddentoken").val(self.document.location.hash.split("&")[0].split("=")[1]);
-	$("#formtext").val(escape(document.cookie.split("=")[1]));
+	$("#formtext").val(escape(getCookie("text")));
+	document.cookie="token="+escape(self.document.location.hash.split("&")[0].split("=")[1]);
 }else{
 	$('#SCSendModal').modal('hide');
 }
@@ -17,7 +35,7 @@ var audio = new Audio();
 
 $(document).ready(function(){
 
-	$('#sendnormaltext').val(escape(document.cookie.split("=")[1]))
+	$('#sendnormaltext').val(escape(getCookie("text")))
 
 	// button bindings
 	$('#playbtn').bind("click", function (){
@@ -37,6 +55,27 @@ $(document).ready(function(){
 	$('#receivemorsetext').bind("propertychange keyup input paste",function() {
 		$("#receivenormaltext").val(DoMorseDecrypt($('#receivemorsetext').val()));
 	});
+	$('#myinbox').bind("click", function(){
+		ajaxresponse = $.ajax({
+			//-- --- .-. ... .
+		url: "https://api.soundcloud.com/me/activities/tracks/exclusive.json?tags="+escape("morsecloud")+"&oauth_token="+escape(getCookie("token"))+"&filter=downloadable&consumer_key=1548641e2e37a7ae5f432f22118497e9",
+		dataType: 'json',
+		success: function(){
+			$('#publictab').removeClass('active');
+			$('#privatetab').addClass('active');
+			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
+			$("#scmorsetable").empty();
+			jQuery.each(ajaxresponse, function (){
+				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this[0].origin.track.id+');"><td>'+this[0].origin.track.user.username+'</td><td>'+this[0].origin.track.title+'</td></a></tr>');
+			})},
+		error: function(){
+			alert("fail!");
+			$('#SCReceiveModal').modal('hide');	
+		}
+		});
+
+
+	});
 
 	$('#SCReceiveModal').on('show', function () {
 		ajaxresponse = $.ajax({
@@ -45,6 +84,7 @@ $(document).ready(function(){
 		dataType: 'json',
 		success: function(){
 			ajaxresponse = jQuery.parseJSON(ajaxresponse.responseText);
+			$("#scmorsetable").empty();
 			jQuery.each(ajaxresponse, function (){
 				$("#scmorsetable").append('<tr onclick="loadSoundCloudTrack('+this.id+');"><td>'+this.user.username+'</td><td>'+this.title+'</td></a></tr>');
 			})},
@@ -54,6 +94,9 @@ $(document).ready(function(){
 		}
 		});
 	});
+
+	
+
 	$("#sendnormaltext").keyup();
 
 })

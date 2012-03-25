@@ -95,7 +95,8 @@ def encode_upload(request):
             'sharing': 'public',
             'downloadable': 'true',
             'asset_data': open(mp3path, 'rb'),
-            'tag_list': 'morsecloud'
+            'tag_list': 'morsecloud',
+            'licence': 'cc-by'
         })
     except Exception as exc:
         return { 'success': False,
@@ -113,14 +114,25 @@ def decode(request):
     client_id = settings['soundcloud.client.id']
 
     track_id = request.GET.get('track_id') or request.POST.get('track_id')
+    oauth_token = request.GET.get('oauth_token') or request.POST.get('oauth_token')
+
     if not track_id:
         return { "error": { "code": "400",
                             "msg": "missing track_id argument" },
                  "success": False }
 
+    params = { 'client_id': client_id }
+    if oauth_token:
+        params['oauth_token'] = oauth_token
+
     else:
-        track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
-                             { 'client_id': client_id })
+        try:
+            track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
+                                 params)
+        except urllib2.HTTPError as exc:
+            return { "error": { "code": exc.code,
+                                "msg": "error code: {0}".format(exc.code) },
+                     "success": False }
 
         if not track.get('download_url'):
             return { "error": { "code": 403,
