@@ -36,13 +36,14 @@ def encode(request, ext='aiff'):
     msg_text = request.POST.get('text') or request.GET.get('text', 'sos')
 
     msg_text = urllib.unquote(msg_text)
-
+    
     # store the audio in memory
     strio_out = StringIO()
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text, strio_out, customWriter=opener, closeWriter=False)
+    
+    mime_type = m.text2audio(msg_text, strio_out, customWriter=opener, closeWriter=False, ignoreMissing=True)
     if not mime_type:
         mime_type = 'audio/x-aiff'
 
@@ -84,7 +85,7 @@ def encode_upload(request):
 
     # write the audio
     m = morseweb.morsecodec.morseCodec()
-    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave)
+    mime_type = m.text2audio(msg_text[:140], mp3path, customWriter=wave, ignoreMissing=True)
 
     client = soundcloud.Client(access_token=oauth_token)
 
@@ -113,14 +114,25 @@ def decode(request):
     client_id = settings['soundcloud.client.id']
 
     track_id = request.GET.get('track_id') or request.POST.get('track_id')
+    oauth_token = request.GET.get('oauth_token') or request.POST.get('oauth_token')
+
     if not track_id:
         return { "error": { "code": "400",
                             "msg": "missing track_id argument" },
                  "success": False }
 
+    params = { 'client_id': client_id }
+    if oauth_token:
+        params['oauth_token'] = oauth_token
+
     else:
-        track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
-                             { 'client_id': client_id })
+        try:
+            track = json_request("http://api.soundcloud.com/tracks/{0}.json".format(track_id),
+                                 params)
+        except urllib2.HTTPError as exc:
+            return { "error": { "code": exc.code,
+                                "msg": "error code: {0}".format(exc.code) },
+                     "success": False }
 
         if not track.get('download_url'):
             return { "error": { "code": 403,

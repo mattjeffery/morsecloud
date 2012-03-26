@@ -107,7 +107,12 @@ class morseCodec(object):
         self.wave = self.mkwave()
         self.nowave = '\0' * len(self.mkwave())
         
-    def text2tab(self, text):
+    def text2tab(self, text, ignoreMissing=False):
+        """If ignore missing, characters not in morse are ignored, else they will throw a KeyError"""
+        if ignoreMissing:
+            for char in set(list(text)):
+                if not char.upper() in self.morsetab.keys():
+                    text = text.replace(char, '')
         return ''.join([self.morsetab[c.upper()]+'\001' for c in text])
         
     def tab2text(self, text, charsep='\001' ):
@@ -181,9 +186,12 @@ class morseCodec(object):
         if closeWriter:
             self.audioWriter.close()
         
-    def text2audio(self, text, filename, customWriter=None, closeWriter=True):
-        """wraps text2tabs and tabs2audio, returns the mimetype (based on the customWriter)"""
-        self.tabs2audio(self.text2tab(text), filename, customWriter=customWriter, closeWriter=closeWriter)
+    def text2audio(self, text, filename, customWriter=None, closeWriter=True, ignoreMissing=False):
+        """
+        wraps text2tabs and tabs2audio, returns the mimetype (based on the customWriter)
+        If ignore missing, characters not in morse are ignored, else they will throw a KeyError"""
+        self.tabs2audio(self.text2tab(text, ignoreMissing),     
+                        filename, customWriter=customWriter, closeWriter=closeWriter)
         if self.audioWriterClass == aifc:
             return 'audio/aiff'
         elif self.audioWriterClass == wave:
