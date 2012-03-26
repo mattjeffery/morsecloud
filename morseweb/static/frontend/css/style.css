@@ -258,7 +258,8 @@ body{
 header{
 	/*background: url("../img/stripepattern.png");*/
 }
-header h1{
+header {
+	margin-top: 20px;
 	position:relative;
 	left: 50%;
 	margin-left: -420px;

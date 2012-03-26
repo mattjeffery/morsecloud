@@ -34,7 +34,7 @@
        chromium.org/developers/how-tos/chrome-frame-getting-started -->
   <!--[if lt IE 7]><p class=chromeframe>Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
   <header>
-		<h1>MORSECLOUD</h1>
+		<img src="img/logov3.png" alt="Morsecloud" />
   </header>
 	<div id="maincontainer" role="main">
 		<div id="encodecontainer" class="container">
@@ -51,7 +51,7 @@
 					</div>
 					<div class="btn-group">
 						<a class="btn" id="downloadbtn" href="#" target="_blanc"><i class="icon-download"></i></a>
-						<a class="btn" id="playbtn"><i class="icon-play"></i></a>						
+						<a class="btn playbtn"><i class="icon-play"></i></a>						
 					</div>
 					</div>
 				</div>
@@ -93,9 +93,16 @@
 			<form action="/api/soundcloud/upload" method=POST>
 				<input type="hidden" name="access_token" id="hiddentoken" value="" />
 				<label>Track title</label>
-				<input type="text" class="span3" name="title" placeholder="tracktitle">
+				<input type="text" class="span5" name="title" placeholder="tracktitle">
 				<label>Morse text</label>
-				<input type="text" class="span3" name="text" id="formtext" placeholder="insert your morse text here">
+				<div class="controls">
+					<div class="input-append">
+						<input type="text" class="span5" name="text" id="formtext" placeholder="insert your morse text here">
+						<button class="btn playbtn" type="button"><i class="icon-play"></i></button>
+					</div>
+				</div>
+				<label>Description</label>
+				<textarea name="description" class="span5" id="formdescription"></textarea>
 				<button type="submit" class="btn">Submit</button>
 			</form>
 			
